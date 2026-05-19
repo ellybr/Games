@@ -1,5 +1,6 @@
 import GameState from '../GameState.js';
 import { drawCharacter, showNotification, drawButton } from '../utils/DrawUtils.js';
+import AudioSystem from '../systems/AudioSystem.js';
 
 // ── Constants ──────────────────────────────────────────
 const FLOOR_Y   = 580;
@@ -17,9 +18,25 @@ const ITEMS = [
 
 const CUSTOMER_NAMES = [
   'Miguel','Carmen','Rosa','Julio','Ana','Pedro','Isabel','Roberto','Luz','Diego',
+  'Marisol','Félix','Yolanda','Ramón','Gladys','Nelson','Esperanza','Tito',
 ];
 const CUSTOMER_COLORS = [0x3A7BD5, 0xE63946, 0x2A9D8F, 0x8338EC, 0xF4A261, 0x2D6A4F, 0xFF6B35, 0x457B9D];
 const SKIN_OPTS = [2, 3, 4, 4, 5, 3, 2, 4];
+
+const CUSTOMER_QUIPS = [
+  '¡Buenos días!',
+  '¿Cómo está usted?',
+  'Mi mamá siempre venía aquí.',
+  '¡Wepa!',
+  'Ay, que rico ese café.',
+  '¿Tiene cambio de $20?',
+  'El barrio ya no es igual...',
+  '¡Gracias, mi amor!',
+  'El García siempre tiene todo.',
+  'Vine por lo de siempre.',
+  'Dale, rápido que llego tarde.',
+  '¡Bendición!',
+];
 
 // ── Customer class ─────────────────────────────────────
 class Customer {
@@ -27,8 +44,13 @@ class Customer {
     this.scene      = scene;
     this.slotX      = slotX;
     this.item       = ITEMS[Phaser.Math.Between(0, ITEMS.length - 1)];
-    this.patience   = 1.0; // 0–1
-    this.maxTime    = 9000; // ms
+
+    // Upgrades affect patience duration
+    const upgrades  = GameState.bodega.upgrades || [];
+    const bonusSec  = (upgrades.includes('estantes') ? 4000 : 0)
+                    + (upgrades.includes('musica')    ? 2000 : 0);
+    this.patience   = 1.0;
+    this.maxTime    = 9000 + bonusSec;
     this.elapsed    = 0;
     this.state      = 'entering'; // entering | waiting | served | leaving
     this.container  = null;
@@ -64,10 +86,17 @@ class Customer {
     this.bubble = this._makeBubble();
     this.container.add(this.bubble);
 
+    // Door bell on entry
+    AudioSystem.doorbell();
+
     // Walk-in tween
     s.tweens.add({
       targets: this.container, x: this.slotX, duration: 1600, ease: 'Power1',
-      onComplete: () => { this.state = 'waiting'; },
+      onComplete: () => {
+        this.state = 'waiting';
+        // Random quip after arriving
+        this._showQuip(CUSTOMER_QUIPS[Phaser.Math.Between(0, CUSTOMER_QUIPS.length - 1)]);
+      },
     });
 
     // Click to serve
@@ -96,6 +125,22 @@ class Customer {
     }).setOrigin(0.5);
     const cont = this.scene.add.container(0, 0, [g, t]);
     return cont;
+  }
+
+  _showQuip(text) {
+    if (!this.container) return;
+    const s  = this.scene;
+    const qg = s.add.graphics();
+    const tw = text.length * 8 + 16;
+    qg.fillStyle(0xFFFDE7, 0.96);
+    qg.fillRoundedRect(-tw / 2 - 20, FLOOR_Y - 310, tw, 30, 6);
+    qg.lineStyle(1, 0xCCBB00, 0.6);
+    qg.strokeRoundedRect(-tw / 2 - 20, FLOOR_Y - 310, tw, 30, 6);
+    const qt = s.add.text(-20, FLOOR_Y - 295, text, {
+      fontSize: '13px', color: '#333', fontFamily: 'Arial', fontStyle: 'italic',
+    }).setOrigin(0.5);
+    this.container.add([qg, qt]);
+    s.tweens.add({ targets: [qg, qt], alpha: 0, duration: 500, delay: 2200, onComplete: () => { qg.destroy(); qt.destroy(); } });
   }
 
   _updateBar() {
@@ -127,12 +172,20 @@ class Customer {
     this.state = 'served';
     if (this._zone) { this._zone.destroy(); this._zone = null; }
 
-    GameState.addCash(this.item.price);
+    // Upgrade price bonuses
+    const upgrades = GameState.bodega.upgrades || [];
+    let price = this.item.price;
+    if (this.item.key === 'cafe'    && upgrades.includes('cafetera'))    price += 2;
+    if (this.item.key === 'cerveza' && upgrades.includes('refrigerador')) price += 3;
+
+    GameState.addCash(price);
     GameState.addTrust(2);
     GameState.stats.customersServed++;
 
+    AudioSystem.register();
+    AudioSystem.coin();
     showNotification(this.scene, this.slotX, FLOOR_Y - 200,
-      `+$${this.item.price}  ¡Gracias!`, { bgColor: 0x2A9D8F });
+      `+$${price}  ¡Gracias!`, { bgColor: 0x2A9D8F });
 
     // Walk out to counter then exit right
     this.scene.tweens.add({
@@ -154,6 +207,7 @@ class Customer {
     if (!served) {
       GameState.addTrust(-3);
       GameState.stats.customersFailed = (GameState.stats.customersFailed || 0) + 1;
+      AudioSystem.buzz();
       showNotification(this.scene, this.slotX, FLOOR_Y - 200,
         '😤 Se fue sin comprar', { bgColor: 0xE63946, duration: 1200 });
     }
@@ -190,6 +244,9 @@ export default class BodegaScene extends Phaser.Scene {
 
     // ── Interior drawing ──────────────────────────────
     this._drawInterior(width, height);
+
+    // ── Ambient music strum ───────────────────────────
+    this.time.delayedCall(400, () => AudioSystem.ambientStrum());
 
     // ── Day 1 tasks or open for business ──────────────
     if (!GameState.bodega.allDay1TasksDone) {
@@ -233,6 +290,21 @@ export default class BodegaScene extends Phaser.Scene {
       this.time.delayedCall(500, () => {
         this.scene.stop('HUDScene');
         this.scene.start('BlockViewScene');
+      });
+    });
+
+    // ── Upgrades button ────────────────────────────────
+    const upgradeCount = (GameState.bodega.upgrades || []).length;
+    const { zone: upZone } = drawButton(this, width - 290, height - 30, 170, 42, `🔧 Mejoras (${upgradeCount}/6)`, {
+      fillColor: 0x2A4A2A, fillColorHover: 0x3A6A3A, fontSize: '15px', radius: 8, depth: 20,
+    });
+    upZone.on('pointerdown', () => {
+      this._stopSpawner();
+      GameState.save();
+      this.cameras.main.fadeOut(400, 0, 0, 0);
+      this.time.delayedCall(400, () => {
+        this.scene.stop('HUDScene');
+        this.scene.start('UpgradeScene');
       });
     });
 
@@ -475,6 +547,7 @@ export default class BodegaScene extends Phaser.Scene {
       }
       GameState.bodega.signFixed = true;
       pulse.destroy(); hint.destroy(); zone.destroy();
+      AudioSystem.chime();
       showNotification(this, sx, sy - 40, '✅ ¡Letrero arreglado!', { bgColor: 0x2A9D8F });
       this._updateTaskText('sign', true);
       this._checkAllTasksDone();
@@ -558,6 +631,7 @@ export default class BodegaScene extends Phaser.Scene {
     if (allDone && !GameState.bodega.allDay1TasksDone) {
       GameState.bodega.allDay1TasksDone = true;
       GameState.save();
+      AudioSystem.chime();
       this.time.delayedCall(600, () => {
         showNotification(this, 640, 340, '🎉 ¡Todas las tareas completas! Los clientes llegan...', {
           bgColor: 0x2A9D8F, duration: 3000,
@@ -570,14 +644,17 @@ export default class BodegaScene extends Phaser.Scene {
   // ── Customer System ────────────────────────────────
   _openForBusiness() {
     this.dayActive = true;
-    const delay = Math.max(3000, 6000 - GameState.time.week * 300);
+    const upgrades  = GameState.bodega.upgrades || [];
+    const acBonus   = upgrades.includes('aireacondicionado') ? 0.7 : 1.0;
+    const baseDelay = Math.max(2500, 6000 - GameState.time.week * 300);
+    const delay     = Math.round(baseDelay * acBonus);
+
     this.spawnTimer = this.time.addEvent({
       delay,
       callback: this._trySpawnCustomer,
       callbackScope: this,
       loop: true,
     });
-    // Spawn first customer quickly
     this.time.delayedCall(1500, () => this._trySpawnCustomer());
   }
 

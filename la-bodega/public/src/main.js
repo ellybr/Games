@@ -10,6 +10,7 @@ import DRMapScene             from './scenes/DRMapScene.js';
 import EventScene             from './scenes/EventScene.js';
 import GameOverScene          from './scenes/GameOverScene.js';
 import CreditsScene           from './scenes/CreditsScene.js';
+import UpgradeScene           from './scenes/UpgradeScene.js';
 
 const config = {
   type: Phaser.AUTO,
@@ -30,6 +31,7 @@ const config = {
     EventScene,
     GameOverScene,
     CreditsScene,
+    UpgradeScene,
   ],
   scale: {
     mode:       Phaser.Scale.FIT,
