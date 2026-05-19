@@ -1,0 +1,14 @@
+{
+  "name": "la-bodega",
+  "version": "1.0.0",
+  "description": "La Bodega — A Dominican Community Management Game",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "setup": "node setup.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "phaser": "^3.60.0"
+  }
+}
