@@ -72,13 +72,20 @@ export default class BootScene extends Phaser.Scene {
     const hasSave = GameState.load();
     if (hasSave) {
       const cont = this.add.text(
-        width / 2, height * 0.91,
+        width / 2, height * 0.88,
         `Continue — Week ${GameState.time.week}, Day ${GameState.time.day}  (${GameState.player.name})`,
         { fontSize: '17px', color: '#A8DADC', fontFamily: 'Arial' }
       ).setOrigin(0.5).setInteractive({ useHandCursor: true });
       cont.on('pointerover', () => cont.setStyle({ color: '#F4A261' }));
       cont.on('pointerout',  () => cont.setStyle({ color: '#A8DADC' }));
       cont.on('pointerdown', () => this._go('BlockViewScene'));
+
+      const newGame = this.add.text(width / 2, height * 0.94, 'New Game', {
+        fontSize: '15px', color: '#555555', fontFamily: 'Arial',
+      }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      newGame.on('pointerover', () => newGame.setStyle({ color: '#AAAAAA' }));
+      newGame.on('pointerout',  () => newGame.setStyle({ color: '#555555' }));
+      newGame.on('pointerdown', () => { GameState.reset(); this._go('CharacterCreationScene'); });
     }
 
     this.input.once('pointerdown', () => {
