@@ -6,50 +6,50 @@ const UPGRADES = [
   {
     id:    'cafetera',
     icon:  '☕',
-    name:  'Cafetera Italiana',
-    desc:  'El café premium vale más. +$2 por cada café vendido.',
+    name:  'Italian Coffee Maker',
+    desc:  'Premium café sells for more. +$2 for every coffee sold.',
     cost:  300,
-    effect: 'Ingresos de café +$2',
+    effect: 'Coffee income +$2',
   },
   {
     id:    'estantes',
     icon:  '🗄️',
-    name:  'Estantes Nuevos',
-    desc:  'Clientes más pacientes. +4 segundos de paciencia.',
+    name:  'New Shelving',
+    desc:  'Customers are more patient. +4 seconds of patience.',
     cost:  400,
-    effect: 'Paciencia del cliente +4s',
+    effect: 'Customer patience +4s',
   },
   {
     id:    'refrigerador',
     icon:  '🧊',
-    name:  'Refrigerador Grande',
-    desc:  'Cerveza premium y jugos. +$3 por bebida fría vendida.',
+    name:  'Big Refrigerator',
+    desc:  'Premium beer and juices. +$3 for every cold drink sold.',
     cost:  500,
-    effect: 'Bebidas frías +$3',
+    effect: 'Cold drinks +$3',
   },
   {
     id:    'aireacondicionado',
     icon:  '❄️',
-    name:  'Aire Acondicionado',
-    desc:  'Más clientes por día. Los clientes llegan más rápido.',
+    name:  'Air Conditioning',
+    desc:  'More customers per day. Customers arrive faster.',
     cost:  600,
-    effect: 'Velocidad de clientes +30%',
+    effect: 'Customer speed +30%',
   },
   {
     id:    'letreros',
     icon:  '💡',
-    name:  'Letreros de Neón',
-    desc:  'El bodega brilla en la noche. Confianza +8 permanente.',
+    name:  'Neon Signs',
+    desc:  'The bodega shines at night. +8 Community Trust permanently.',
     cost:  200,
-    effect: '+8 Confianza al instalar',
+    effect: '+8 Trust on install',
   },
   {
     id:    'musica',
     icon:  '🎵',
-    name:  'Sistema de Música',
-    desc:  'Bachata todo el día. Clientes contentos permanecen más.',
+    name:  'Music System',
+    desc:  'Bachata all day. Happy customers stick around longer.',
     cost:  350,
-    effect: 'Paciencia del cliente +2s extra',
+    effect: 'Customer patience +2s extra',
   },
 ];
 
@@ -72,7 +72,7 @@ export default class UpgradeScene extends Phaser.Scene {
     headerG.lineStyle(1, 0xF4A261, 0.5);
     headerG.strokeRect(0, 71, width, 1);
 
-    this.add.text(width / 2, 22, '🔧  Mejoras del Bodega García', {
+    this.add.text(width / 2, 22, '🔧  Upgrades — Bodega García', {
       fontSize: '28px', color: '#F4A261', fontFamily: 'Georgia, serif', fontStyle: 'bold',
     }).setOrigin(0.5);
 
@@ -96,7 +96,7 @@ export default class UpgradeScene extends Phaser.Scene {
     });
 
     // Back button
-    const { zone } = drawButton(this, 90, height - 36, 150, 46, '← Volver', {
+    const { zone } = drawButton(this, 90, height - 36, 150, 46, '← Back', {
       fillColor: 0x333355, fillColorHover: 0x4444AA, fontSize: '19px', radius: 8, depth: 10,
     });
     zone.on('pointerdown', () => {
@@ -153,7 +153,7 @@ export default class UpgradeScene extends Phaser.Scene {
     // Cost / owned badge
     const badgeX = cx + w / 2 - 80;
     if (owned) {
-      this.add.text(badgeX, cy, '✅ Instalado', {
+      this.add.text(badgeX, cy, '✅ Installed', {
         fontSize: '15px', color: '#2A9D8F', fontFamily: 'Arial', fontStyle: 'bold',
       }).setOrigin(0.5).setDepth(6);
     } else {
@@ -190,7 +190,7 @@ export default class UpgradeScene extends Phaser.Scene {
     GameState.save();
     AudioSystem.upgrade();
     showNotification(this, this.scale.width / 2, 100,
-      `✅ ${up.name} instalado!`, { bgColor: 0x2A9D8F, duration: 2000 });
+      `✅ ${up.name} installed!`, { bgColor: 0x2A9D8F, duration: 2000 });
 
     this.time.delayedCall(400, () => this.scene.restart());
   }

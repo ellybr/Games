@@ -74,7 +74,7 @@ export default class CutsceneScene extends Phaser.Scene {
       stroke: '#000', strokeThickness: 1,
     }).setOrigin(0.5).setAlpha(0);
 
-    const dateCaption = this.add.text(width / 2, 56, 'Una semana después del funeral...', {
+    const dateCaption = this.add.text(width / 2, 56, 'Back home. After four years away.', {
       fontSize: '16px', color: '#888888', fontFamily: 'Georgia, serif', fontStyle: 'italic',
     }).setOrigin(0.5).setAlpha(0);
 
@@ -87,59 +87,59 @@ export default class CutsceneScene extends Phaser.Scene {
       this.dialogue.show([
         {
           speaker: 'Doña Carmen',
-          text: '¡Ay, mija! ¿Estás bien? Sé que esta semana ha sido muy dura para ti y tu familia.',
+          text: 'Mija! You\'re back! Four years at school and you got taller somehow. Washington Heights missed you.',
           accent: 0xF4A261,
         },
         {
           speaker: GameState.player.name,
-          text: '...Sí, Doña Carmen. No puedo creer que Abuelo se fue. El bodega era su vida entera.',
+          text: 'Doña Carmen... I can\'t believe how much has changed. The bodega looks... tired.',
           accent: 0xA8DADC,
         },
         {
           speaker: 'Doña Carmen',
-          text: 'Tu abuelo me dijo: "Carmen, si algo me pasa, cuida a mi nieta." Y aquí estoy, mija.',
+          text: 'Ay, your abuela tried her best, pero her knees... you know. She kept it open as long as she could.',
           accent: 0xF4A261,
         },
         {
           speaker: GameState.player.name,
-          text: 'Hay una carta... dice que me deja todo. El bodega, el apartamento de arriba... todo.',
+          text: 'She called me last month, said she needed help. I didn\'t know it was this bad.',
           accent: 0xA8DADC,
         },
         {
           speaker: 'Doña Carmen',
-          text: '¡Claro que sí! Cuarenta años tu abuelo aquí. Este bloque es García. ¡Tú eres García!',
+          text: 'The block needs you, mija. García\'s has been here 40 years. This community depends on it.',
           accent: 0xF4A261,
         },
         {
+          speaker: GameState.player.name,
+          text: 'I just finished school. I could\'ve gone anywhere. But this is home, you know?',
+          accent: 0xA8DADC,
+        },
+        {
           speaker: 'Doña Carmen',
-          text: 'Pero ten cuidado, mija. Ya andan unos tipos preguntando por las propiedades del bloque. Developers.',
+          text: 'And look — some developers been sniffing around. Asking about properties on the block. Be careful, mija.',
           accent: 0xE63946,
         },
         {
           speaker: GameState.player.name,
-          text: '¿Developers? No van a tocar nada de esto. Primero tienen que pasar por mí.',
+          text: 'Over my dead body. This bodega stays García\'s. I didn\'t come back to watch it disappear.',
           accent: 0xA8DADC,
         },
         {
           speaker: 'Doña Carmen',
-          text: 'Eso es, mija. La comunidad está contigo. ¡Tenemos La San, tenemos el bloque, tenemos fe!',
+          text: 'That\'s what I wanted to hear! La San is still going strong — the community has your back.',
           accent: 0xF4A261,
         },
         {
-          speaker: GameState.player.name,
-          text: 'Voy a restaurar el bodega. Voy a servir este barrio como lo hizo Abuelo. Mejor.',
-          accent: 0xA8DADC,
-        },
-        {
           speaker: '',
-          text: '[ Doña Carmen te da las llaves del Bodega García. Tu historia comienza ahora. ]',
+          text: '[ Doña Carmen hands you the keys to Bodega García. Time to bring it back to life. ]',
           accent: 0x2A9D8F,
         },
       ], () => this._proceed());
     });
 
     // Skip button
-    const skip = this.add.text(width - 20, height - 20, 'Saltar →', {
+    const skip = this.add.text(width - 20, height - 20, 'Skip →', {
       fontSize: '16px', color: '#555555', fontFamily: 'Arial',
     }).setOrigin(1, 1).setInteractive({ useHandCursor: true });
     skip.on('pointerover', () => skip.setStyle({ color: '#AAAAAA' }));

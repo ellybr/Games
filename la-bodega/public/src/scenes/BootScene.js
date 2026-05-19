@@ -50,14 +50,14 @@ export default class BootScene extends Phaser.Scene {
       shadow: { offsetX: 4, offsetY: 4, color: '#000', blur: 12, fill: true },
     }).setOrigin(0.5).setAlpha(0);
 
-    const sub = this.add.text(width / 2, height * 0.72, 'Un legado. Una comunidad. Tu historia.', {
+    const sub = this.add.text(width / 2, height * 0.72, 'A legacy. A community. Your story.', {
       fontFamily: 'Georgia, serif',
       fontSize: '26px',
       color: '#A8DADC',
       fontStyle: 'italic',
     }).setOrigin(0.5).setAlpha(0);
 
-    const prompt = this.add.text(width / 2, height * 0.85, 'TOCA PARA COMENZAR', {
+    const prompt = this.add.text(width / 2, height * 0.85, 'CLICK TO START', {
       fontFamily: 'Arial, sans-serif',
       fontSize: '20px',
       color: '#FFFFFF',
@@ -73,7 +73,7 @@ export default class BootScene extends Phaser.Scene {
     if (hasSave) {
       const cont = this.add.text(
         width / 2, height * 0.91,
-        `Continuar — Semana ${GameState.time.week}, Día ${GameState.time.day}  (${GameState.player.name})`,
+        `Continue — Week ${GameState.time.week}, Day ${GameState.time.day}  (${GameState.player.name})`,
         { fontSize: '17px', color: '#A8DADC', fontFamily: 'Arial' }
       ).setOrigin(0.5).setInteractive({ useHandCursor: true });
       cont.on('pointerover', () => cont.setStyle({ color: '#F4A261' }));

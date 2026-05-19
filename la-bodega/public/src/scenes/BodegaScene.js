@@ -24,18 +24,18 @@ const CUSTOMER_COLORS = [0x3A7BD5, 0xE63946, 0x2A9D8F, 0x8338EC, 0xF4A261, 0x2D6
 const SKIN_OPTS = [2, 3, 4, 4, 5, 3, 2, 4];
 
 const CUSTOMER_QUIPS = [
-  '¡Buenos días!',
-  '¿Cómo está usted?',
-  'Mi mamá siempre venía aquí.',
-  '¡Wepa!',
-  'Ay, que rico ese café.',
-  '¿Tiene cambio de $20?',
-  'El barrio ya no es igual...',
-  '¡Gracias, mi amor!',
-  'El García siempre tiene todo.',
-  'Vine por lo de siempre.',
-  'Dale, rápido que llego tarde.',
-  '¡Bendición!',
+  'Good morning, mija!',
+  'Ay, it smells like home in here.',
+  'My mom used to bring me here as a kid.',
+  'Wepa! You reopened it!',
+  'That coffee though... nobody does it like García\'s.',
+  'You got change for a $20?',
+  'The neighborhood\'s changing but this place stays real.',
+  'Thank you, mi amor!',
+  'García\'s always has what I need.',
+  'Just grabbing my usual.',
+  'Dale, I\'m running late but I need my café.',
+  'Bendición! So glad you\'re back.',
 ];
 
 // ── Customer class ─────────────────────────────────────
@@ -185,7 +185,7 @@ class Customer {
     AudioSystem.register();
     AudioSystem.coin();
     showNotification(this.scene, this.slotX, FLOOR_Y - 200,
-      `+$${price}  ¡Gracias!`, { bgColor: 0x2A9D8F });
+      `+$${price}  Gracias!`, { bgColor: 0x2A9D8F });
 
     // Walk out to counter then exit right
     this.scene.tweens.add({
@@ -496,18 +496,18 @@ export default class BodegaScene extends Phaser.Scene {
   // ── Day 1 Task System ──────────────────────────────
   _setupDay1Tasks() {
     const tasks = [
-      { key: 'sign',    done: GameState.bodega.signFixed,        label: '🔧 Arreglar el letrero' },
-      { key: 'shelf_0', done: GameState.bodega.shelvesStocked[0], label: '📦 Llenar estante 1' },
-      { key: 'shelf_1', done: GameState.bodega.shelvesStocked[1], label: '📦 Llenar estante 2' },
-      { key: 'shelf_2', done: GameState.bodega.shelvesStocked[2], label: '📦 Llenar estante 3' },
-      { key: 'door',    done: GameState.bodega.isOpen,            label: '🚪 Abrir el bodega' },
+      { key: 'sign',    done: GameState.bodega.signFixed,        label: '🔧 Fix the sign' },
+      { key: 'shelf_0', done: GameState.bodega.shelvesStocked[0], label: '📦 Stock shelf 1' },
+      { key: 'shelf_1', done: GameState.bodega.shelvesStocked[1], label: '📦 Stock shelf 2' },
+      { key: 'shelf_2', done: GameState.bodega.shelvesStocked[2], label: '📦 Stock shelf 3' },
+      { key: 'door',    done: GameState.bodega.isOpen,            label: '🚪 Open the bodega' },
     ];
 
     // Task list panel
     const panelG = this.add.graphics().setDepth(8);
     panelG.fillStyle(0x080818, 0.88); panelG.fillRoundedRect(8, 68, 248, 200, 10);
     panelG.lineStyle(2, 0xF4A261, 1); panelG.strokeRoundedRect(8, 68, 248, 200, 10);
-    this.add.text(132, 82, '📋 Día 1 — Tareas', {
+    this.add.text(132, 82, '📋 Day 1 — Tasks', {
       fontSize: '15px', color: '#F4A261', fontFamily: 'Arial', fontStyle: 'bold',
     }).setOrigin(0.5).setDepth(9);
 
@@ -535,20 +535,20 @@ export default class BodegaScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(10);
     this.tweens.add({ targets: pulse, alpha: { from: 1, to: 0.3 }, duration: 700, yoyo: true, repeat: -1 });
 
-    const hint = this.add.text(sx, sy + 24, 'Haz clic para arreglar ($20)', {
+    const hint = this.add.text(sx, sy + 24, 'Click to fix the sign ($20)', {
       fontSize: '13px', color: '#F4A261', fontFamily: 'Arial',
     }).setOrigin(0.5).setDepth(10);
 
     const zone = this.add.zone(sx, sy, 160, 60).setInteractive({ useHandCursor: true }).setDepth(11);
     zone.on('pointerdown', () => {
       if (!GameState.spendCash(20)) {
-        showNotification(this, sx, sy - 40, '¡No tienes suficiente dinero!', { bgColor: 0xE63946 });
+        showNotification(this, sx, sy - 40, 'Not enough cash, mija!', { bgColor: 0xE63946 });
         return;
       }
       GameState.bodega.signFixed = true;
       pulse.destroy(); hint.destroy(); zone.destroy();
       AudioSystem.chime();
-      showNotification(this, sx, sy - 40, '✅ ¡Letrero arreglado!', { bgColor: 0x2A9D8F });
+      showNotification(this, sx, sy - 40, '✅ Sign fixed!', { bgColor: 0x2A9D8F });
       this._updateTaskText('sign', true);
       this._checkAllTasksDone();
     });
@@ -560,7 +560,7 @@ export default class BodegaScene extends Phaser.Scene {
     const shelfY = 230;
     GameState.bodega.shelvesStocked.forEach((stocked, i) => {
       if (stocked) return;
-      const marker = this.add.text(shelfX[i], shelfY, '📦 Vacío\n(Haz clic: $50)', {
+      const marker = this.add.text(shelfX[i], shelfY, '📦 Empty\n(Click to restock: $50)', {
         fontSize: '15px', color: '#F4A261', fontFamily: 'Arial', align: 'center',
       }).setOrigin(0.5).setDepth(10);
       this.tweens.add({ targets: marker, y: shelfY - 8, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
@@ -568,12 +568,12 @@ export default class BodegaScene extends Phaser.Scene {
       const zone = this.add.zone(shelfX[i], shelfY, 200, 140).setInteractive({ useHandCursor: true }).setDepth(11);
       zone.on('pointerdown', () => {
         if (!GameState.spendCash(50)) {
-          showNotification(this, shelfX[i], shelfY - 50, 'Necesitas $50', { bgColor: 0xE63946 });
+          showNotification(this, shelfX[i], shelfY - 50, 'Need $50 to restock!', { bgColor: 0xE63946 });
           return;
         }
         GameState.bodega.shelvesStocked[i] = true;
         marker.destroy(); zone.destroy();
-        showNotification(this, shelfX[i], shelfY - 50, `✅ ¡Estante ${i + 1} listo!`, { bgColor: 0x2A9D8F });
+        showNotification(this, shelfX[i], shelfY - 50, `✅ Shelf ${i + 1} stocked!`, { bgColor: 0x2A9D8F });
         this._updateTaskText(`shelf_${i}`, true);
         this._checkAllTasksDone();
         // Flash + reload scene to show stocked shelves
@@ -586,7 +586,7 @@ export default class BodegaScene extends Phaser.Scene {
   _addDoorTask() {
     if (GameState.bodega.isOpen) return;
     const dx = DOOR_X + 47, dy = FLOOR_Y - 70;
-    const marker = this.add.text(dx, dy, '🚪 ¡Abrir!', {
+    const marker = this.add.text(dx, dy, '🚪 Open up!', {
       fontSize: '17px', color: '#2ECC71', fontFamily: 'Arial', fontStyle: 'bold',
     }).setOrigin(0.5).setDepth(10);
     this.tweens.add({ targets: marker, alpha: { from: 1, to: 0.4 }, duration: 600, yoyo: true, repeat: -1 });
@@ -595,12 +595,12 @@ export default class BodegaScene extends Phaser.Scene {
     zone.on('pointerdown', () => {
       // Check if shelves are stocked first
       if (!GameState.bodega.shelvesStocked.every(Boolean)) {
-        showNotification(this, dx, dy - 50, '¡Llena los estantes primero!', { bgColor: 0xF4A261 });
+        showNotification(this, dx, dy - 50, 'Stock the shelves first, mija!', { bgColor: 0xF4A261 });
         return;
       }
       GameState.bodega.isOpen = true;
       marker.destroy(); zone.destroy();
-      showNotification(this, dx, dy - 50, '🎉 ¡El bodega está ABIERTO!', { bgColor: 0x2A9D8F });
+      showNotification(this, dx, dy - 50, '🎉 García\'s is OPEN for business!', { bgColor: 0x2A9D8F });
       this._updateTaskText('door', true);
       this._checkAllTasksDone();
     });
@@ -609,11 +609,11 @@ export default class BodegaScene extends Phaser.Scene {
   _updateTaskText(key, done) {
     if (!this._taskTexts?.[key]) return;
     const labels = {
-      sign:    '🔧 Arreglar el letrero',
-      shelf_0: '📦 Llenar estante 1',
-      shelf_1: '📦 Llenar estante 2',
-      shelf_2: '📦 Llenar estante 3',
-      door:    '🚪 Abrir el bodega',
+      sign:    '🔧 Fix the sign',
+      shelf_0: '📦 Stock shelf 1',
+      shelf_1: '📦 Stock shelf 2',
+      shelf_2: '📦 Stock shelf 3',
+      door:    '🚪 Open the bodega',
     };
     const t = this._taskTexts[key];
     if (done) {
@@ -633,7 +633,7 @@ export default class BodegaScene extends Phaser.Scene {
       GameState.save();
       AudioSystem.chime();
       this.time.delayedCall(600, () => {
-        showNotification(this, 640, 340, '🎉 ¡Todas las tareas completas! Los clientes llegan...', {
+        showNotification(this, 640, 340, '🎉 All done! Customers are coming...', {
           bgColor: 0x2A9D8F, duration: 3000,
         });
         this.time.delayedCall(2000, () => this._openForBusiness());

@@ -21,13 +21,13 @@ export default class HUDScene extends Phaser.Scene {
     });
 
     // ── Day / Week ────────────────────────────────────────
-    this.timeText = this.add.text(width / 2, 16, 'Semana 1 · Día 1', {
+    this.timeText = this.add.text(width / 2, 16, 'Week 1 · Day 1', {
       fontSize: '20px', color: '#FFFFFF', fontFamily: 'Georgia, serif',
     }).setOrigin(0.5);
 
     // ── Community Trust ──────────────────────────────────
     const trustLabelX = width - 340;
-    this.add.text(trustLabelX, 10, 'Confianza Comunitaria', {
+    this.add.text(trustLabelX, 10, 'Community Trust', {
       fontSize: '13px', color: '#A8DADC', fontFamily: 'Arial',
     });
     this.trustBarBg = this.add.graphics();
@@ -43,7 +43,7 @@ export default class HUDScene extends Phaser.Scene {
     this.gentBarBg.fillStyle(0x221111, 1);
     this.gentBarBg.fillRoundedRect(width - 112, 27, 96, 16, 4);
     this.gentBarFill = this.add.graphics();
-    this.add.text(width - 112, 12, 'Presión', {
+    this.add.text(width - 112, 12, 'Pressure', {
       fontSize: '13px', color: '#FF8888', fontFamily: 'Arial',
     });
 
@@ -107,7 +107,7 @@ export default class HUDScene extends Phaser.Scene {
     panG.lineStyle(3, 0xF4A261, 1);
     panG.strokeRoundedRect(-200, -240, 400, 480, 16);
 
-    const titleT = this.add.text(0, -205, '⚙  PAUSA', {
+    const titleT = this.add.text(0, -205, '⚙  PAUSED', {
       fontSize: '28px', color: '#F4A261', fontFamily: 'Georgia, serif', fontStyle: 'bold',
     }).setOrigin(0.5);
 
@@ -116,19 +116,19 @@ export default class HUDScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     const statsT = this.add.text(0, -120, [
-      `Semana ${GameState.time.week}  ·  Día ${GameState.time.day}`,
+      `Week ${GameState.time.week}  ·  Day ${GameState.time.day}`,
       `💵 $${Math.floor(GameState.finances.cash).toLocaleString()}`,
-      `🤝 Confianza: ${GameState.stats.communityTrust}/100`,
-      `🏗️ Presión: ${GameState.stats.gentrificationPressure}/100`,
+      `🤝 Trust: ${GameState.stats.communityTrust}/100`,
+      `🏗️ Pressure: ${GameState.stats.gentrificationPressure}/100`,
     ].join('\n'), {
       fontSize: '16px', color: '#CCCCCC', fontFamily: 'Arial', align: 'center', lineSpacing: 6,
     }).setOrigin(0.5);
 
     // Buttons
     const buttons = [
-      { label: '▶  Reanudar',   color: 0x2A9D8F, hover: 0x3BB8A8, action: () => this._hidePause() },
-      { label: '📖  Créditos',  color: 0x334466, hover: 0x4455AA, action: () => this._goCredits() },
-      { label: '🔄  Reiniciar', color: 0x663333, hover: 0xAA4444, action: () => this._confirmRestart(ov) },
+      { label: '▶  Resume',   color: 0x2A9D8F, hover: 0x3BB8A8, action: () => this._hidePause() },
+      { label: '📖  Credits',  color: 0x334466, hover: 0x4455AA, action: () => this._goCredits() },
+      { label: '🔄  Restart', color: 0x663333, hover: 0xAA4444, action: () => this._confirmRestart(ov) },
     ];
 
     const btnObjs = buttons.map((b, i) => {
@@ -151,7 +151,7 @@ export default class HUDScene extends Phaser.Scene {
     });
 
     // Keyboard hint
-    const hintT = this.add.text(0, 220, 'ESC para reanudar', {
+    const hintT = this.add.text(0, 220, 'ESC to resume', {
       fontSize: '14px', color: '#444444', fontFamily: 'Arial',
     }).setOrigin(0.5);
 
@@ -193,19 +193,19 @@ export default class HUDScene extends Phaser.Scene {
     cpan.fillRoundedRect(-180, -80, 360, 160, 12);
     cpan.lineStyle(2, 0xE63946, 1);
     cpan.strokeRoundedRect(-180, -80, 360, 160, 12);
-    const ct = this.add.text(0, -48, '¿Reiniciar el juego?\nSe perderá el progreso.', {
+    const ct = this.add.text(0, -48, 'Restart the game?\nYour progress will be lost.', {
       fontSize: '18px', color: '#FFFFFF', fontFamily: 'Georgia, serif', align: 'center', lineSpacing: 4,
     }).setOrigin(0.5);
 
     const yesG = this.add.graphics();
     yesG.fillStyle(0xE63946, 1); yesG.fillRoundedRect(-155, 18, 130, 40, 8);
-    const yesT = this.add.text(-90, 38, 'Sí, reiniciar', { fontSize: '16px', color: '#FFF', fontFamily: 'Arial' }).setOrigin(0.5);
+    const yesT = this.add.text(-90, 38, 'Yes, restart', { fontSize: '16px', color: '#FFF', fontFamily: 'Arial' }).setOrigin(0.5);
     const yesZ = this.add.zone(-90, 38, 130, 40).setInteractive({ useHandCursor: true });
     yesZ.on('pointerdown', () => { this._hidePause(); GameState.reset(); });
 
     const noG = this.add.graphics();
     noG.fillStyle(0x333355, 1); noG.fillRoundedRect(25, 18, 130, 40, 8);
-    const noT = this.add.text(90, 38, 'Cancelar', { fontSize: '16px', color: '#FFF', fontFamily: 'Arial' }).setOrigin(0.5);
+    const noT = this.add.text(90, 38, 'Cancel', { fontSize: '16px', color: '#FFF', fontFamily: 'Arial' }).setOrigin(0.5);
     const noZ = this.add.zone(90, 38, 130, 40).setInteractive({ useHandCursor: true });
     noZ.on('pointerdown', () => conf.destroy());
 
@@ -224,7 +224,7 @@ export default class HUDScene extends Phaser.Scene {
 
     const dayNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
     const dayName  = dayNames[(gs.time.dayOfWeek - 1) % 7];
-    this.timeText.setText(`Semana ${gs.time.week}  ·  Día ${gs.time.day}  (${dayName})`);
+    this.timeText.setText(`Week ${gs.time.week}  ·  Day ${gs.time.day}  (${dayName})`);
 
     const trustX = width - 340;
     const trustFill = Math.max(0, Math.min(1, gs.stats.communityTrust / 100)) * 196;
@@ -242,7 +242,7 @@ export default class HUDScene extends Phaser.Scene {
     if (gentFill > 0) this.gentBarFill.fillRoundedRect(width - 110, 29, gentFill, 12, 3);
 
     if (gs.laSan.active) {
-      this.laSanBadge.setText(gs.laSan.playerPaidThisWeek ? '💰 La San ✓' : '💰 La San pendiente');
+      this.laSanBadge.setText(gs.laSan.playerPaidThisWeek ? '💰 La San ✓' : '💰 La San due');
       this.laSanBadge.setStyle({ color: gs.laSan.playerPaidThisWeek ? '#2A9D8F' : '#F4A261' });
     }
   }
