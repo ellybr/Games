@@ -503,8 +503,9 @@ export default class BodegaScene extends Phaser.Scene {
         showNotification(this, shelfX[i], shelfY - 50, `✅ ¡Estante ${i + 1} listo!`, { bgColor: 0x2A9D8F });
         this._updateTaskText(`shelf_${i}`, true);
         this._checkAllTasksDone();
-        // Redraw shelves
-        this.scene.restart();
+        // Flash + reload scene to show stocked shelves
+        this.cameras.main.flash(300, 255, 255, 255, true);
+        this.time.delayedCall(320, () => this.scene.restart());
       });
     });
   }

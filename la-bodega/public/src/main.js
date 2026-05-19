@@ -1,3 +1,4 @@
+import PreloadScene          from './scenes/PreloadScene.js';
 import BootScene             from './scenes/BootScene.js';
 import CharacterCreationScene from './scenes/CharacterCreationScene.js';
 import CutsceneScene          from './scenes/CutsceneScene.js';
@@ -8,6 +9,7 @@ import LaSanScene             from './scenes/LaSanScene.js';
 import DRMapScene             from './scenes/DRMapScene.js';
 import EventScene             from './scenes/EventScene.js';
 import GameOverScene          from './scenes/GameOverScene.js';
+import CreditsScene           from './scenes/CreditsScene.js';
 
 const config = {
   type: Phaser.AUTO,
@@ -16,6 +18,7 @@ const config = {
   backgroundColor: '#0d0d1a',
   parent: 'game-container',
   scene: [
+    PreloadScene,       // first — branded splash
     BootScene,
     CharacterCreationScene,
     CutsceneScene,
@@ -26,6 +29,7 @@ const config = {
     DRMapScene,
     EventScene,
     GameOverScene,
+    CreditsScene,
   ],
   scale: {
     mode:       Phaser.Scale.FIT,
