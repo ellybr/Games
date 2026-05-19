@@ -6,6 +6,8 @@ import BodegaScene            from './scenes/BodegaScene.js';
 import HUDScene               from './scenes/HUDScene.js';
 import LaSanScene             from './scenes/LaSanScene.js';
 import DRMapScene             from './scenes/DRMapScene.js';
+import EventScene             from './scenes/EventScene.js';
+import GameOverScene          from './scenes/GameOverScene.js';
 
 const config = {
   type: Phaser.AUTO,
@@ -22,6 +24,8 @@ const config = {
     HUDScene,
     LaSanScene,
     DRMapScene,
+    EventScene,
+    GameOverScene,
   ],
   scale: {
     mode:       Phaser.Scale.FIT,

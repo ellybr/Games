@@ -1,5 +1,6 @@
 import GameState from '../GameState.js';
 import { drawButton, showNotification } from '../utils/DrawUtils.js';
+import { shouldFireEvent } from '../scenes/EventScene.js';
 
 // Building layout data (x, width, height, floors)
 const BLOCK = [
@@ -363,9 +364,22 @@ export default class BlockViewScene extends Phaser.Scene {
     if (this.dayEnded) return;
     this.dayEnded = true;
 
-    const income  = GameState.finances.weeklyIncome;
-    const served  = GameState.stats.customersServed;
-    const newWeek = GameState.advanceDay();
+    // Check immediate game-over conditions before advancing
+    if (GameState.stats.gentrificationPressure >= 100) {
+      this.cameras.main.fadeOut(700, 0, 0, 0);
+      this.time.delayedCall(700, () => this.scene.start('GameOverScene', { reason: 'gentrification' }));
+      return;
+    }
+    if (GameState.finances.cash < -500) {
+      this.cameras.main.fadeOut(700, 0, 0, 0);
+      this.time.delayedCall(700, () => this.scene.start('GameOverScene', { reason: 'bankrupt' }));
+      return;
+    }
+
+    const income   = GameState.finances.weeklyIncome;
+    const served   = GameState.stats.customersServed;
+    const newWeek  = GameState.advanceDay();
+    const fireEv   = newWeek && shouldFireEvent(GameState.time.week);
     GameState.save();
 
     const { width, height } = this.scale;
@@ -373,14 +387,22 @@ export default class BlockViewScene extends Phaser.Scene {
 
     const bg = this.add.graphics();
     bg.fillStyle(0x050510, 0.96);
-    bg.fillRoundedRect(-280, -220, 560, 440, 16);
+    bg.fillRoundedRect(-280, -230, 560, 460, 16);
     bg.lineStyle(2, 0x1565C0, 1);
-    bg.strokeRoundedRect(-280, -220, 560, 440, 16);
+    bg.strokeRoundedRect(-280, -230, 560, 460, 16);
 
-    const moonIcon = this.add.text(0, -190, '🌙', { fontSize: '38px' }).setOrigin(0.5);
-    const dayTitle = this.add.text(0, -148, `Día ${GameState.time.day - 1} — Resumen`, {
+    const moonIcon = this.add.text(0, -200, '🌙', { fontSize: '38px' }).setOrigin(0.5);
+    const dayTitle = this.add.text(0, -158, `Día ${GameState.time.day - 1} — Resumen`, {
       fontSize: '26px', color: '#A8DADC', fontFamily: 'Georgia, serif', fontStyle: 'bold',
     }).setOrigin(0.5);
+
+    // Milestone banners
+    const milestones = [];
+    if (income >= 100) milestones.push('🔥 ¡Gran día! +$100 o más');
+    if (GameState.stats.communityTrust >= 75 && !GameState._shownTrust75) {
+      milestones.push('⭐ ¡75 de Confianza!'); GameState._shownTrust75 = true;
+    }
+    if (newWeek) milestones.push(`✨ Semana ${GameState.time.week} completada`);
 
     const lines = [
       `💵  Ingresos del día:     $${income.toLocaleString()}`,
@@ -389,31 +411,60 @@ export default class BlockViewScene extends Phaser.Scene {
       `🏗️   Presión gentrific.:  ${GameState.stats.gentrificationPressure}/100`,
       `💰  Efectivo total:       $${Math.floor(GameState.finances.cash).toLocaleString()}`,
     ];
-    const summary = this.add.text(0, -20, lines.join('\n'), {
+    const summary = this.add.text(0, -30, lines.join('\n'), {
       fontSize: '19px', color: '#FFFFFF', fontFamily: 'Georgia, serif', lineSpacing: 10,
     }).setOrigin(0.5);
 
-    let nextLabel = newWeek ? '¡Nueva semana! Ver La San  →' : 'Siguiente Día  →';
-    const btnG = this.add.graphics();
-    btnG.fillStyle(0x1565C0, 1);
-    btnG.fillRoundedRect(-130, 165, 260, 46, 8);
-    const btnT = this.add.text(0, 188, nextLabel, {
-      fontSize: '20px', color: '#FFFFFF', fontFamily: 'Georgia, serif',
-    }).setOrigin(0.5);
-    const btnZ = this.add.zone(0, 188, 260, 46).setInteractive({ useHandCursor: true });
-    btnZ.on('pointerdown', () => {
+    let milestoneText = null;
+    if (milestones.length > 0) {
+      milestoneText = this.add.text(0, 130, milestones.join('   '), {
+        fontSize: '16px', color: '#F4A261', fontFamily: 'Arial', fontStyle: 'bold', align: 'center',
+      }).setOrigin(0.5);
+    }
+
+    // Determine where "next" leads
+    const goNext = () => {
       box.destroy();
-      if (newWeek && GameState.laSan.active) {
+      // Game-over check after week expenses
+      if (GameState.stats.gentrificationPressure >= 100) {
+        this.cameras.main.fadeOut(600, 0, 0, 0);
+        this.time.delayedCall(600, () => this.scene.start('GameOverScene', { reason: 'gentrification' }));
+        return;
+      }
+      if (GameState.finances.cash < -500) {
+        this.cameras.main.fadeOut(600, 0, 0, 0);
+        this.time.delayedCall(600, () => this.scene.start('GameOverScene', { reason: 'bankrupt' }));
+        return;
+      }
+      if (fireEv) {
         this.cameras.main.fadeOut(500, 0, 0, 0);
-        this.time.delayedCall(500, () => {
-          this.scene.start('LaSanScene');
-        });
+        this.time.delayedCall(500, () => this.scene.start('EventScene', { afterScene: newWeek && GameState.laSan.active ? 'LaSanScene' : 'BlockViewScene' }));
+      } else if (newWeek && GameState.laSan.active) {
+        this.cameras.main.fadeOut(500, 0, 0, 0);
+        this.time.delayedCall(500, () => this.scene.start('LaSanScene'));
       } else {
         this.dayEnded = false;
         this.scene.restart();
       }
-    });
+    };
 
-    box.add([bg, moonIcon, dayTitle, summary, btnG, btnT, btnZ]);
+    const nextLabel = fireEv
+      ? '¡Hay novedades en el barrio!  →'
+      : newWeek && GameState.laSan.active
+        ? '¡Nueva semana! Ver La San  →'
+        : 'Siguiente Día  →';
+
+    const btnG = this.add.graphics();
+    btnG.fillStyle(fireEv ? 0xE63946 : 0x1565C0, 1);
+    btnG.fillRoundedRect(-150, 170, 300, 46, 8);
+    const btnT = this.add.text(0, 193, nextLabel, {
+      fontSize: '18px', color: '#FFFFFF', fontFamily: 'Georgia, serif',
+    }).setOrigin(0.5);
+    const btnZ = this.add.zone(0, 193, 300, 46).setInteractive({ useHandCursor: true });
+    btnZ.on('pointerdown', goNext);
+
+    const children = [bg, moonIcon, dayTitle, summary, btnG, btnT, btnZ];
+    if (milestoneText) children.push(milestoneText);
+    box.add(children);
   }
 }
