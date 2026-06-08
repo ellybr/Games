@@ -6,24 +6,25 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     // ── Player / persistent state ────────────────────────────────────────────
-    public string PlayerName     = "Player";
-    public int    SkinToneIndex  = 0;
-    public int    OutfitIndex    = 0;
-    public bool   IsMujer        = false;
-    public float  MoneyEarned    = 0f;
-    public int    DayNumber      = 1;
+    public string PlayerName      = "Player";
+    public int    SkinToneIndex   = 0;
+    public int    OutfitIndex     = 0;
+    public bool   IsMujer         = false;
+    public float  MoneyEarned     = 0f;
+    public int    DayNumber       = 1;
     public int    CustomersServed = 0;
-    public float  RunningDebt    = 0f;
+    public float  RunningDebt     = 0f;
     public float  TodayDeliveryCost = 0f;
-    public float  TodayEarned    = 0f;
-    public float  TodayNet       = 0f;
+    public float  TodayEarned     = 0f;
+    public float  TodayNet        = 0f;
     public bool   MissedHospitalBill = false;
 
     public const float DebtGameOverThreshold = 300f;
-    const float  HospitalBillAmount  = 120f;
+    const float  HospitalBillAmount   = 120f;
     const int    HospitalBillInterval = 3;
 
-    // ── Phase 1: Day Events ──────────────────────────────────────────────────
+    // ── Phase 1: inner types ─────────────────────────────────────────────────
+
     public enum DayEvent
     {
         Normal,
@@ -64,7 +65,7 @@ public class GameManager : MonoBehaviour
     }
 
     // ── Phase 1: public fields ───────────────────────────────────────────────
-    public DayEvent  TodayEvent        = DayEvent.Normal;
+    public DayEvent     TodayEvent        = DayEvent.Normal;
     public ChoiceEffect TodayChoiceEffect = ChoiceEffect.None;
 
     public float FreddyTotalDebt      = 0f;
@@ -86,22 +87,22 @@ public class GameManager : MonoBehaviour
     // ── Game flow ────────────────────────────────────────────────────────────
     public void StartNewGame()
     {
-        MoneyEarned      = 0f;
-        CustomersServed  = 0;
-        RunningDebt      = 0f;
-        TodayEarned      = 0f;
-        TodayNet         = 0f;
+        MoneyEarned       = 0f;
+        CustomersServed   = 0;
+        RunningDebt       = 0f;
+        TodayEarned       = 0f;
+        TodayNet          = 0f;
         TodayDeliveryCost = 0f;
-        DayNumber        = 1;
+        DayNumber         = 1;
         MissedHospitalBill = false;
 
-        TodayEvent         = DayEvent.Normal;
-        TodayChoiceEffect  = ChoiceEffect.None;
-        FreddyTotalDebt    = 0f;
-        FreddyUnpaidStreak = 0;
-        FreddyBanned       = false;
+        TodayEvent           = DayEvent.Normal;
+        TodayChoiceEffect    = ChoiceEffect.None;
+        FreddyTotalDebt      = 0f;
+        FreddyUnpaidStreak   = 0;
+        FreddyBanned         = false;
         FreddyPaybackPending = false;
-        Relationships      = new Dictionary<string, CustomerRelationship>();
+        Relationships        = new Dictionary<string, CustomerRelationship>();
 
         GoToCutscene();
     }
@@ -259,9 +260,9 @@ public class GameManager : MonoBehaviour
 
     public void MakeChoice(bool choiceA)
     {
-        DayChoice choice    = GetMorningChoice();
-        TodayChoiceEffect   = choiceA ? choice.effectA : choice.effectB;
-        float cost          = choiceA ? choice.costA   : choice.costB;
+        DayChoice choice  = GetMorningChoice();
+        TodayChoiceEffect = choiceA ? choice.effectA : choice.effectB;
+        float cost        = choiceA ? choice.costA   : choice.costB;
         if (cost > 0f)
             MoneyEarned -= cost;
 
@@ -291,7 +292,7 @@ public class GameManager : MonoBehaviour
             FreddyUnpaidStreak = 0;
             if (FreddyPaybackPending)
             {
-                FreddyTotalDebt    = Mathf.Max(0f, FreddyTotalDebt - 5f);
+                FreddyTotalDebt      = Mathf.Max(0f, FreddyTotalDebt - 5f);
                 FreddyPaybackPending = false;
             }
         }

@@ -70,21 +70,21 @@ public static class LaBodegaSetup
         AnchorPos(headGO, new Vector2(0f, 45f), new Vector2(72f, 72f));
         var headImg = headGO.AddComponent<Image>();
         headImg.sprite = knob;
-        headImg.color = new Color(0.94f, 0.76f, 0.58f);
+        headImg.color  = new Color(0.94f, 0.76f, 0.58f);
 
         var eyeL = new GameObject("EyeL");
         eyeL.transform.SetParent(pp, false);
         AnchorPos(eyeL, new Vector2(-14f, 52f), new Vector2(10f, 10f));
         var eyeLImg = eyeL.AddComponent<Image>();
         eyeLImg.sprite = knob;
-        eyeLImg.color = new Color(0.1f, 0.06f, 0.02f);
+        eyeLImg.color  = new Color(0.1f, 0.06f, 0.02f);
 
         var eyeR = new GameObject("EyeR");
         eyeR.transform.SetParent(pp, false);
         AnchorPos(eyeR, new Vector2(14f, 52f), new Vector2(10f, 10f));
         var eyeRImg = eyeR.AddComponent<Image>();
         eyeRImg.sprite = knob;
-        eyeRImg.color = new Color(0.1f, 0.06f, 0.02f);
+        eyeRImg.color  = new Color(0.1f, 0.06f, 0.02f);
 
         var bodyGO = new GameObject("Body");
         bodyGO.transform.SetParent(pp, false);
@@ -149,17 +149,17 @@ public static class LaBodegaSetup
 
         // ── Wire controller ──
         var ctrl = new GameObject("Controller").AddComponent<CharacterCustomizationController>();
-        ctrl.headImage       = headImg;
-        ctrl.hairImage       = hairImg;
-        ctrl.bodyImage       = bodyImg;
-        ctrl.nameInput       = nameInput;
-        ctrl.skinToneButtons = skinBtns;
-        ctrl.genderHombre    = hombreBtn;
-        ctrl.genderMujer     = mujerBtn;
-        ctrl.outfitLabel     = outfitName;
+        ctrl.headImage        = headImg;
+        ctrl.hairImage        = hairImg;
+        ctrl.bodyImage        = bodyImg;
+        ctrl.nameInput        = nameInput;
+        ctrl.skinToneButtons  = skinBtns;
+        ctrl.genderHombre     = hombreBtn;
+        ctrl.genderMujer      = mujerBtn;
+        ctrl.outfitLabel      = outfitName;
         ctrl.prevOutfitButton = prevBtn;
         ctrl.nextOutfitButton = nextBtn;
-        ctrl.startButton     = startBtn;
+        ctrl.startButton      = startBtn;
 
         EditorSceneManager.SaveScene(scene, ScenePath + "CharacterCustomization.unity");
     }
@@ -214,8 +214,8 @@ public static class LaBodegaSetup
         AddCamera();
         AddEventSystem();
 
-        var canvas = MakeCanvas();
-        var ct = canvas.transform;
+        var canvas   = MakeCanvas();
+        var ct       = canvas.transform;
         var canvasRT = canvas.GetComponent<RectTransform>();
 
         MakePanel(ct, "Background", new Color(0.10f, 0.07f, 0.04f));
@@ -299,8 +299,8 @@ public static class LaBodegaSetup
             barFill.transform.SetParent(barBG.transform, false);
             Stretch(barFill, Vector2.zero, Vector2.one, new Vector2(2, 2), new Vector2(-2, -2));
             var fillImg = barFill.AddComponent<Image>();
-            fillImg.color = Color.green;
-            fillImg.type = Image.Type.Filled;
+            fillImg.color      = Color.green;
+            fillImg.type       = Image.Type.Filled;
             fillImg.fillMethod = Image.FillMethod.Horizontal;
             fillImg.fillOrigin = 0;
             fillImg.fillAmount = 1f;
@@ -346,7 +346,7 @@ public static class LaBodegaSetup
             item.AddComponent<Image>().color = itemColors[i];
             item.AddComponent<CanvasGroup>();
             var drag = item.AddComponent<DraggableItem>();
-            drag.itemType = itemTypes[i];
+            drag.itemType  = itemTypes[i];
             draggables[i] = drag;
 
             var lbl = MakeTMP(item.transform, "Label", itemNames[i], 15);
@@ -370,19 +370,38 @@ public static class LaBodegaSetup
         // ── Morning overlay (on top of everything) ──
         var morningOverlay = MakePanel(ct, "MorningOverlay", new Color(0f, 0f, 0f, 0.92f));
 
-        var morningTitle = MakeTMP(morningOverlay.transform, "MorningTitle", "Day 1", 40);
+        var morningTitle = MakeTMP(morningOverlay.transform, "MorningTitle", "Day 1", 36);
         morningTitle.color = new Color(1f, 0.85f, 0.3f);
         morningTitle.enableWordWrapping = true;
-        AnchorPos(morningTitle.gameObject, new Vector2(0, 160f), new Vector2(340f, 90f));
+        AnchorPos(morningTitle.gameObject, new Vector2(0, 195f), new Vector2(340f, 65f));
 
-        var morningBills = MakeTMP(morningOverlay.transform, "MorningBills", "", 22);
+        var dayEventText = MakeTMP(morningOverlay.transform, "DayEventText", "", 17);
+        dayEventText.color = new Color(0.75f, 0.85f, 0.6f);
+        dayEventText.enableWordWrapping = true;
+        AnchorPos(dayEventText.gameObject, new Vector2(0, 140f), new Vector2(340f, 38f));
+
+        var morningBills = MakeTMP(morningOverlay.transform, "MorningBills", "", 19);
         morningBills.color = new Color(0.9f, 0.85f, 0.75f);
         morningBills.enableWordWrapping = true;
-        AnchorPos(morningBills.gameObject, new Vector2(0, -10f), new Vector2(320f, 220f));
+        AnchorPos(morningBills.gameObject, new Vector2(0, 28f), new Vector2(310f, 140f));
+
+        var choiceLabel = MakeTMP(morningOverlay.transform, "ChoiceLabel", "Before you open:", 16);
+        choiceLabel.color = new Color(0.7f, 0.6f, 0.4f);
+        AnchorPos(choiceLabel.gameObject, new Vector2(0, -67f), new Vector2(310f, 28f));
+
+        var choiceAButton = MakeButton(morningOverlay.transform, "ChoiceAButton", "", 15,
+            new Color(0.20f, 0.35f, 0.20f));
+        AnchorPos(choiceAButton.gameObject, new Vector2(0, -112f), new Vector2(310f, 56f));
+        choiceAButton.GetComponentInChildren<TextMeshProUGUI>().enableWordWrapping = true;
+
+        var choiceBButton = MakeButton(morningOverlay.transform, "ChoiceBButton", "", 15,
+            new Color(0.25f, 0.25f, 0.25f));
+        AnchorPos(choiceBButton.gameObject, new Vector2(0, -178f), new Vector2(310f, 56f));
+        choiceBButton.GetComponentInChildren<TextMeshProUGUI>().enableWordWrapping = true;
 
         var openBtn = MakeButton(morningOverlay.transform, "OpenButton", "Open the Bodega", 26,
             new Color(0.88f, 0.38f, 0.08f));
-        AnchorPos(openBtn.gameObject, new Vector2(0, -230f), new Vector2(260f, 64f));
+        AnchorPos(openBtn.gameObject, new Vector2(0, -256f), new Vector2(260f, 60f));
 
         // ── Wire controller ──
         var ctrl = new GameObject("Controller").AddComponent<BodegaDayController>();
@@ -397,7 +416,10 @@ public static class LaBodegaSetup
         ctrl.feedbackText      = feedback;
         ctrl.morningOverlay    = morningOverlay;
         ctrl.morningTitleText  = morningTitle;
+        ctrl.dayEventText      = dayEventText;
         ctrl.morningBillText   = morningBills;
+        ctrl.choiceAButton     = choiceAButton;
+        ctrl.choiceBButton     = choiceBButton;
         ctrl.openButton        = openBtn;
         ctrl.endOverlay        = endOverlay;
         ctrl.endSummaryText    = endSummary;
@@ -462,13 +484,13 @@ public static class LaBodegaSetup
     static Canvas MakeCanvas()
     {
         var go = new GameObject("Canvas");
-        var c = go.AddComponent<Canvas>();
+        var c  = go.AddComponent<Canvas>();
         c.renderMode = RenderMode.ScreenSpaceOverlay;
         var scaler = go.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.uiScaleMode         = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(390, 844);
-        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-        scaler.matchWidthOrHeight = 0.5f;
+        scaler.screenMatchMode     = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+        scaler.matchWidthOrHeight  = 0.5f;
         go.AddComponent<GraphicRaycaster>();
         return c;
     }
@@ -478,9 +500,9 @@ public static class LaBodegaSetup
         var go = new GameObject("Main Camera");
         go.tag = "MainCamera";
         var cam = go.AddComponent<Camera>();
-        cam.clearFlags = CameraClearFlags.SolidColor;
+        cam.clearFlags      = CameraClearFlags.SolidColor;
         cam.backgroundColor = Color.black;
-        cam.orthographic = true;
+        cam.orthographic    = true;
         go.AddComponent<AudioListener>();
     }
 
@@ -506,10 +528,10 @@ public static class LaBodegaSetup
         var go = new GameObject(name);
         go.transform.SetParent(parent, false);
         var t = go.AddComponent<TextMeshProUGUI>();
-        t.text = text;
-        t.fontSize = size;
+        t.text      = text;
+        t.fontSize  = size;
         t.alignment = align;
-        t.color = Color.white;
+        t.color     = Color.white;
         return t;
     }
 
@@ -523,10 +545,10 @@ public static class LaBodegaSetup
         var lgo = new GameObject("Label");
         lgo.transform.SetParent(go.transform, false);
         var tmp = lgo.AddComponent<TextMeshProUGUI>();
-        tmp.text = label;
-        tmp.fontSize = fontSize;
+        tmp.text      = label;
+        tmp.fontSize  = fontSize;
         tmp.alignment = TextAlignmentOptions.Center;
-        tmp.color = Color.white;
+        tmp.color     = Color.white;
         var lrt = lgo.GetComponent<RectTransform>();
         lrt.anchorMin = Vector2.zero;
         lrt.anchorMax = Vector2.one;
@@ -556,24 +578,24 @@ public static class LaBodegaSetup
         var textGO = new GameObject("Text");
         textGO.transform.SetParent(area.transform, false);
         var textComp = textGO.AddComponent<TextMeshProUGUI>();
-        textComp.fontSize = 20;
-        textComp.color = Color.white;
+        textComp.fontSize  = 20;
+        textComp.color     = Color.white;
         textComp.alignment = TextAlignmentOptions.Left;
         SetFullRect(textGO);
 
         var phGO = new GameObject("Placeholder");
         phGO.transform.SetParent(area.transform, false);
         var phComp = phGO.AddComponent<TextMeshProUGUI>();
-        phComp.text = "Enter your name...";
-        phComp.fontSize = 20;
-        phComp.color = new Color(0.45f, 0.45f, 0.45f);
+        phComp.text      = "Enter your name...";
+        phComp.fontSize  = 20;
+        phComp.color     = new Color(0.45f, 0.45f, 0.45f);
         phComp.fontStyle = FontStyles.Italic;
         phComp.alignment = TextAlignmentOptions.Left;
         SetFullRect(phGO);
 
-        field.textViewport = art;
+        field.textViewport  = art;
         field.textComponent = textComp;
-        field.placeholder = phComp;
+        field.placeholder   = phComp;
 
         return field;
     }
@@ -582,10 +604,10 @@ public static class LaBodegaSetup
     {
         var rt = go.GetComponent<RectTransform>();
         if (rt == null) rt = go.AddComponent<RectTransform>();
-        rt.anchorMin = new Vector2(0.5f, 0.5f);
-        rt.anchorMax = new Vector2(0.5f, 0.5f);
+        rt.anchorMin        = new Vector2(0.5f, 0.5f);
+        rt.anchorMax        = new Vector2(0.5f, 0.5f);
         rt.anchoredPosition = pos;
-        rt.sizeDelta = size;
+        rt.sizeDelta        = size;
     }
 
     static void Stretch(GameObject go, Vector2 anchorMin, Vector2 anchorMax,
