@@ -37,6 +37,7 @@ public static class LaBodegaSetup
     static void BuildCharacterCustomizationScene()
     {
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        AddCamera();
         AddEventSystem();
 
         // GameManager lives here; DontDestroyOnLoad keeps it for the whole run
@@ -125,6 +126,7 @@ public static class LaBodegaSetup
     static void BuildCutsceneScene()
     {
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        AddCamera();
         AddEventSystem();
 
         var canvas = MakeCanvas();
@@ -169,6 +171,7 @@ public static class LaBodegaSetup
     static void BuildBodegaDayScene()
     {
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        AddCamera();
         AddEventSystem();
 
         var canvas = MakeCanvas();
@@ -267,6 +270,7 @@ public static class LaBodegaSetup
     static void BuildGameOverScene()
     {
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        AddCamera();
         AddEventSystem();
 
         var canvas = MakeCanvas();
@@ -326,6 +330,17 @@ public static class LaBodegaSetup
         scaler.matchWidthOrHeight = 0.5f;
         go.AddComponent<GraphicRaycaster>();
         return c;
+    }
+
+    static void AddCamera()
+    {
+        var go = new GameObject("Main Camera");
+        go.tag = "MainCamera";
+        var cam = go.AddComponent<Camera>();
+        cam.clearFlags = CameraClearFlags.SolidColor;
+        cam.backgroundColor = Color.black;
+        cam.orthographic = true;
+        go.AddComponent<AudioListener>();
     }
 
     static void AddEventSystem()
@@ -403,7 +418,7 @@ public static class LaBodegaSetup
         var textComp = textGO.AddComponent<TextMeshProUGUI>();
         textComp.fontSize = 20;
         textComp.color = Color.white;
-        textComp.alignment = TextAlignmentOptions.MidpointLeft;
+        textComp.alignment = TextAlignmentOptions.Left;
         SetFullRect(textGO);
 
         var phGO = new GameObject("Placeholder");
@@ -413,7 +428,7 @@ public static class LaBodegaSetup
         phComp.fontSize = 20;
         phComp.color = new Color(0.45f, 0.45f, 0.45f);
         phComp.fontStyle = FontStyles.Italic;
-        phComp.alignment = TextAlignmentOptions.MidpointLeft;
+        phComp.alignment = TextAlignmentOptions.Left;
         SetFullRect(phGO);
 
         field.textViewport = art;
