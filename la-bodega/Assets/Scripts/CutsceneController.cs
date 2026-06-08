@@ -20,6 +20,11 @@ public class CutsceneController : MonoBehaviour
 
     void Start()
     {
+        if (GameManager.Instance != null && GameManager.Instance.DayNumber > 1)
+        {
+            GameManager.Instance.GoToBodegaDay();
+            return;
+        }
         tapButton.onClick.AddListener(Advance);
         ShowPanel(0);
     }

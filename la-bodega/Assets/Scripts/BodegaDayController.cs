@@ -26,15 +26,15 @@ public class BodegaDayController : MonoBehaviour
     }
 
     static readonly CustomerDef[] CustomerPool = {
-        new CustomerDef { name="Dona Rosa",     order=ItemType.Coffee,   orderText="Un cafe, please.",           patienceDuration=20f, baseEarning=2f,   tipBonus=1.50f },
-        new CustomerDef { name="Mr. Patel",     order=ItemType.Snacks,   orderText="Chips, any kind.",           patienceDuration=12f, baseEarning=2f,   tipBonus=0f    },
-        new CustomerDef { name="Little Carlos", order=ItemType.Snacks,   orderText="Gimme snacks!",              patienceDuration=6f,  baseEarning=1.5f, tipBonus=0f    },
-        new CustomerDef { name="Maria",         order=ItemType.Coffee,   orderText="Coffee please.",             patienceDuration=11f, baseEarning=2f,   tipBonus=0.50f },
-        new CustomerDef { name="Uncle Freddy",  order=ItemType.Sandwich, orderText="Sandwich. I'll pay you back.", patienceDuration=18f, baseEarning=2.5f, tipBonus=0f, isFreddy=true },
-        new CustomerDef { name="Big Lou",       order=ItemType.Sandwich, orderText="Sandwich, now. I'm starving.", patienceDuration=7f, baseEarning=2.5f, tipBonus=2f  },
-        new CustomerDef { name="Yolanda",       order=ItemType.Lottery,  orderText="Quick Pick, please.",        patienceDuration=11f, baseEarning=2f,   tipBonus=0f    },
-        new CustomerDef { name="The Professor", order=ItemType.Coffee,   orderText="A coffee, if you would.",   patienceDuration=25f, baseEarning=2f,   tipBonus=3f    },
-        new CustomerDef { name="Old Man Tony",  order=ItemType.Lottery,  orderText="Lottery. Same numbers.",    patienceDuration=15f, baseEarning=2f,   tipBonus=0.25f },
+        new CustomerDef { name="Dona Rosa",     order=ItemType.Coffee,   orderText="Un cafe, please.",             patienceDuration=20f, baseEarning=2f,   tipBonus=1.50f },
+        new CustomerDef { name="Mr. Patel",     order=ItemType.Snacks,   orderText="Chips, any kind.",             patienceDuration=12f, baseEarning=2f,   tipBonus=0f    },
+        new CustomerDef { name="Little Carlos", order=ItemType.Snacks,   orderText="Gimme snacks!",                patienceDuration=6f,  baseEarning=1.5f, tipBonus=0f    },
+        new CustomerDef { name="Maria",         order=ItemType.Coffee,   orderText="Coffee please.",               patienceDuration=11f, baseEarning=2f,   tipBonus=0.50f },
+        new CustomerDef { name="Uncle Freddy",  order=ItemType.Sandwich, orderText="Sandwich. I'll pay you back.", patienceDuration=18f, baseEarning=2.5f, tipBonus=0f,   isFreddy=true },
+        new CustomerDef { name="Big Lou",       order=ItemType.Sandwich, orderText="Sandwich, now. I'm starving.", patienceDuration=7f,  baseEarning=2.5f, tipBonus=2f    },
+        new CustomerDef { name="Yolanda",       order=ItemType.Lottery,  orderText="Quick Pick, please.",          patienceDuration=11f, baseEarning=2f,   tipBonus=0f    },
+        new CustomerDef { name="The Professor", order=ItemType.Coffee,   orderText="A coffee, if you would.",     patienceDuration=25f, baseEarning=2f,   tipBonus=3f    },
+        new CustomerDef { name="Old Man Tony",  order=ItemType.Lottery,  orderText="Lottery. Same numbers.",      patienceDuration=15f, baseEarning=2f,   tipBonus=0.25f },
     };
 
     const int MaxSlots = 3;
@@ -56,6 +56,12 @@ public class BodegaDayController : MonoBehaviour
     [Header("Feedback")]
     public TextMeshProUGUI feedbackText;
 
+    [Header("Morning Overlay")]
+    public GameObject morningOverlay;
+    public TextMeshProUGUI morningTitleText;
+    public TextMeshProUGUI morningBillText;
+    public Button openButton;
+
     [Header("End Overlay")]
     public GameObject endOverlay;
     public TextMeshProUGUI endSummaryText;
@@ -68,16 +74,21 @@ public class BodegaDayController : MonoBehaviour
     float timeLeft;
     float nextSpawnIn;
     float moneyEarned;
+    float moneyEarnedToday;
     int reputation;
     int customersServed;
     bool dayOver;
+    bool dayStarted;
 
     void Start()
     {
         timeLeft = DayDuration;
         moneyEarned = GameManager.Instance != null ? GameManager.Instance.MoneyEarned : 0f;
+        moneyEarnedToday = 0f;
         int day = GameManager.Instance != null ? GameManager.Instance.DayNumber : 1;
         reputation = MaxReputation;
+        dayOver = false;
+        dayStarted = false;
 
         dayLabel.text = "Day " + day;
         feedbackText.text = "";
@@ -90,15 +101,48 @@ public class BodegaDayController : MonoBehaviour
         }
 
         endButton.onClick.AddListener(EndDay);
+        openButton.onClick.AddListener(OpenBodega);
         UpdateHUD();
         RefreshReputation();
+
+        if (GameManager.Instance != null) GameManager.Instance.PrepareDay();
+        ShowMorningOverlay();
 
         nextSpawnIn = 1.5f;
     }
 
+    void ShowMorningOverlay()
+    {
+        morningOverlay.SetActive(true);
+        int day = GameManager.Instance != null ? GameManager.Instance.DayNumber : 1;
+        morningTitleText.text = "Day " + day;
+
+        if (GameManager.Instance != null)
+        {
+            var gm = GameManager.Instance;
+            string bills = "Goya delivery: -$" + gm.TodayDeliveryCost.ToString("F0");
+            if (gm.IsHospitalDay())
+                bills += "\nAbuela's hospital: -$" + gm.HospitalBill.ToString("F0");
+            bills += "\n\nYou need $" + gm.TotalDailyExpenses().ToString("F0") + " to break even.";
+            if (gm.RunningDebt > 0f)
+                bills += "\n\nDebt on the books: $" + gm.RunningDebt.ToString("F0");
+            morningBillText.text = bills;
+        }
+        else
+        {
+            morningBillText.text = "Open up and get to work.";
+        }
+    }
+
+    void OpenBodega()
+    {
+        morningOverlay.SetActive(false);
+        dayStarted = true;
+    }
+
     void Update()
     {
-        if (dayOver) return;
+        if (!dayStarted || dayOver) return;
 
         timeLeft -= Time.deltaTime;
         nextSpawnIn -= Time.deltaTime;
@@ -144,7 +188,7 @@ public class BodegaDayController : MonoBehaviour
 
     public void TryServeAtScreenPoint(Vector2 screenPos, ItemType item, Camera cam)
     {
-        if (dayOver) return;
+        if (!dayStarted || dayOver) return;
 
         for (int i = 0; i < MaxSlots; i++)
         {
@@ -177,6 +221,7 @@ public class BodegaDayController : MonoBehaviour
             if (pays)
             {
                 moneyEarned += def.baseEarning;
+                moneyEarnedToday += def.baseEarning;
                 ShowFeedback("Freddy actually paid! $" + def.baseEarning.ToString("F2"), true);
             }
             else
@@ -191,6 +236,7 @@ public class BodegaDayController : MonoBehaviour
         float tip = def.tipBonus * slots[i].patience;
         float earned = def.baseEarning + tip;
         moneyEarned += earned;
+        moneyEarnedToday += earned;
         customersServed++;
 
         string msg = "+" + earned.ToString("F2");
@@ -273,16 +319,30 @@ public class BodegaDayController : MonoBehaviour
     {
         if (dayOver) return;
         dayOver = true;
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.MoneyEarned = moneyEarned;
+            GameManager.Instance.EndDayFinances(moneyEarnedToday);
+        }
+
         int day = GameManager.Instance != null ? GameManager.Instance.DayNumber : 1;
-        string header = reputation <= 0 ? "Closed early — no reputation left." : "Day done!";
+        float expenses = GameManager.Instance != null ? GameManager.Instance.TotalDailyExpenses() : 0f;
+        float net = moneyEarnedToday - expenses;
+        string netColor = net >= 0 ? "+" : "";
+        string header = reputation <= 0 ? "Closed early!\nNo rep left." : "Day " + day + " done!";
+
         endSummaryText.text =
             header + "\n\n" +
-            "Day " + day + "\n" +
             "Served: " + customersServed + " customers\n" +
-            "Earned: $" + moneyEarned.ToString("F2");
+            "Earned:   $" + moneyEarnedToday.ToString("F2") + "\n" +
+            "Expenses: -$" + expenses.ToString("F2") + "\n" +
+            "Net: " + netColor + net.ToString("F2") +
+            (GameManager.Instance != null && GameManager.Instance.RunningDebt > 0f
+                ? "\n\nDebt: $" + GameManager.Instance.RunningDebt.ToString("F0")
+                : "");
+
         endOverlay.SetActive(true);
-        if (GameManager.Instance != null)
-            GameManager.Instance.MoneyEarned = moneyEarned;
     }
 
     void EndDay()
